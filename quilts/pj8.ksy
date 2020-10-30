@@ -1,4 +1,3 @@
-
 meta:
   id: pj8
   file-extension: pj8
@@ -21,8 +20,8 @@ seq:
     repeat-expr: file_header.entry2.count
   - id: unknown1
     contents: [0x00]
-  - id: unknown2
-    type: u4
+  - id: colors
+    type: color
     repeat: expr
     repeat-expr: entry2[1]
   - id: unknown3
@@ -99,6 +98,16 @@ types:
         type: u4
       - id: stuff
         size: entry_length - 64
+  color:
+    seq:
+      - id: red
+        type: u1
+      - id: green
+        type: u1
+      - id: blue
+        type: u1
+      - id: alpha
+        type: u1
   unknown3_type:
     seq:
       - id: count
