@@ -1,3 +1,4 @@
+
 meta:
   id: pj8
   file-extension: pj8
@@ -8,19 +9,32 @@ seq:
     contents: 'EQ8PJ8'
   - id: file_header
     type: pj8_header
-  - id: preview_header
-    type: preview_header
-instances:
-  jpegs:
-    pos: _root.file_header.jpeg_entries.start
+  - id: entry0
+    size: 12
+  - id: entry1
+    type: u1
+    repeat: expr
+    repeat-expr: file_header.entry1.count
+  - id: entry2
+    type: u1
+    repeat: expr
+    repeat-expr: file_header.entry2.count
+  - id: unknown1
+    contents: [0x00]
+  - id: unknown2
+    type: u4
+    repeat: expr
+    repeat-expr: entry2[1]
+  - id: unknown3
+    type: unknown3_type
+  - id: jpegs
     type: jpeg_entry
     repeat: expr
-    repeat-expr: _root.file_header.jpeg_entries.count
-  bloks:
-    pos: _root.file_header.blok_entries.start
+    repeat-expr: file_header.jpeg_entries.count
+  - id: bloks
     type: blok_entry
     repeat: expr
-    repeat-expr: _root.file_header.blok_entries.count
+    repeat-expr: file_header.blok_entries.count
 types:
   blok:
     seq:
@@ -41,13 +55,17 @@ types:
       - id: blok_entries
         type: allocation_table_entry
       - id: allocation_table
-        type: allocation_table_entry
         repeat: expr
         repeat-expr: 14
+        type:
+          switch-on: _index
+          cases:
+            _: allocation_table_entry
       - id: allocation_table_ending
-        contents: [0x0, 0x0, 0x49, 0x03]
-      - id: magic_ending
-        contents: "EQ8!!:-)"
+        contents: [0x0, 0x0]
+      
+      #- id: magic_ending
+      #  contents: "EQ8!!:-)"
   allocation_table_entry:
     seq:
       - id: col1
@@ -56,16 +74,6 @@ types:
         type: u4
       - id: count
         type: u2
-  preview_header:
-    seq:
-      - id: len1
-        type: u1
-      - id: len2
-        type: u1
-      - id: header1
-        size: len1
-      - id: header2
-        size: len2
   blok_entry:
     seq:
       - id: entry_length
@@ -91,3 +99,11 @@ types:
         type: u4
       - id: stuff
         size: entry_length - 64
+  unknown3_type:
+    seq:
+      - id: count
+        type: u2
+      - id: items
+        type: u2
+        repeat: expr
+        repeat-expr: count
